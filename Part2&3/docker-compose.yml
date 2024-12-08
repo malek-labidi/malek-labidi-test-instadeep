@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  instadeep-db:
+    container_name: instadeep-db
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: insatdeep
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - "3307:3306"
+    volumes:
+      - instadeep_db_data:/var/lib/mysql
+    restart: always
+    networks:
+      - task-management-network
+  task-management-service:
+    container_name: task-managment-service
+    image: maleklabidi/task-managment:1.0
+    ports:
+      - "8080:8083"
+    expose:
+      - "8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - instadeep-db
+    networks:
+      - task-management-network
+    restart: unless-stopped
+
+# Réseau pour les services
+networks:
+  task-management-network:
+    driver: bridge
+volumes:
+  instadeep_db_data:
+    driver: local
